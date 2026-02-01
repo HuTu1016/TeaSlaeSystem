@@ -106,7 +106,7 @@ const loadPendingItems = async () => {
   pendingLoading.value = true
   try {
     const res = await getPendingReviewItems({ page: pendingPage.value, pageSize: pendingPageSize.value })
-    pendingItems.value = res.items || res || []
+    pendingItems.value = res.list || res.items || []
     pendingTotal.value = res.total || pendingItems.value.length
   } catch (error) {
     console.error('加载待评价列表失败:', error)
