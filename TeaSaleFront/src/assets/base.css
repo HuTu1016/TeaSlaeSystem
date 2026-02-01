@@ -1,0 +1,86 @@
+/* Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&family=Noto+Serif+SC:wght@300;400;600;700&family=Lato:wght@300;400;700&display=swap');
+
+/* color palette - Teasenz Premium Style */
+:root {
+  --vt-c-white: #ffffff;
+  --vt-c-white-soft: #fcfbf7;
+  /* Rice paper / Warm white */
+  --vt-c-white-mute: #f2f2f2;
+
+  --vt-c-black: #1a1a1a;
+  --vt-c-black-soft: #2c2c2c;
+  --vt-c-black-mute: #3a3a3a;
+
+  /* Primary Brand Colors */
+  --vt-c-tea-green-dark: #2c4c3b;
+  /* Deep refined green */
+  --vt-c-tea-green-light: #5d7d65;
+  /* Softer Sage green */
+  --vt-c-tea-gold: #c5a47e;
+  /* Elegant gold/bronze for accents */
+  --vt-c-tea-red: #8b3a3a;
+  /* Traditional clay pot red for highlights */
+
+  --vt-c-text-light-1: #2c3e50;
+  --vt-c-text-light-2: #5f6368;
+  --vt-c-text-dark-1: var(--vt-c-white);
+  --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
+}
+
+/* semantic color variables for this project */
+:root {
+  --color-background: var(--vt-c-white-soft);
+  --color-background-soft: var(--vt-c-white);
+  --color-background-mute: var(--vt-c-white-mute);
+
+  --color-border: #e6e3d8;
+  --color-border-hover: var(--vt-c-tea-gold);
+
+  --color-heading: var(--vt-c-tea-green-dark);
+  --color-text: #4a4a4a;
+
+  --color-primary: var(--vt-c-tea-green-dark);
+  --color-accent: var(--vt-c-tea-gold);
+
+  --section-gap: 80px;
+
+  /* Typography */
+  --font-heading: 'Noto Serif SC', 'Merriweather', serif;
+  --font-body: 'Lato', 'PingFang SC', sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-background: var(--vt-c-black);
+    --color-background-soft: var(--vt-c-black-soft);
+    --color-background-mute: var(--vt-c-black-mute);
+
+    --color-border: #444;
+    --color-heading: #e0e0e0;
+    --color-text: #b0b0b0;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  font-weight: normal;
+}
+
+body {
+  min-height: 100vh;
+  color: var(--color-text);
+  background: var(--color-background);
+  transition:
+    color 0.5s,
+    background-color 0.5s;
+  line-height: 1.6;
+  font-family: var(--font-body);
+  font-size: 15px;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

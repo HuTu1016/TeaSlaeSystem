@@ -1,0 +1,51 @@
+:root {
+  --el-color-primary: #10B981;
+  /* 茶叶绿 */
+  --el-color-primary-light-3: #4ADE80;
+  --el-color-primary-light-5: #34D399;
+  --el-color-primary-light-7: #6EE7B7;
+  --el-color-primary-light-8: #A7F3D0;
+  --el-color-primary-light-9: #D1FAE5;
+  --el-color-primary-dark-2: #059669;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f5f7fa;
+  color: #303133;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* 简单的工具类 */
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.h-full {
+  height: 100%;
+}
+
+.mb-4 {
+  margin-bottom: 1rem;
+}
+
+.p-4 {
+  padding: 1rem;
+}
+
+.bg-white {
+  background-color: #fff;
+}
