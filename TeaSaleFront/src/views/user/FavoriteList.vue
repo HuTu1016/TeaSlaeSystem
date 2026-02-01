@@ -27,10 +27,12 @@
     <div class="pagination-container" v-if="total > 0">
       <el-pagination
         background
-        layout="prev, pager, next"
-        :total="total"
-        :page-size="pageSize"
         v-model:current-page="currentPage"
+        v-model:page-size="pageSize"
+        :page-sizes="[10, 20, 50, 100]"
+        :total="total"
+        layout="total, sizes, prev, pager, next, jumper"
+        @size-change="handleSizeChange"
         @current-change="loadData"
       />
     </div>
@@ -47,7 +49,7 @@ const router = useRouter()
 const loading = ref(false)
 const products = ref([])
 const currentPage = ref(1)
-const pageSize = ref(12)
+const pageSize = ref(10)
 const total = ref(0)
 
 const loadData = async () => {
@@ -64,6 +66,12 @@ const loadData = async () => {
     } finally {
         loading.value = false
     }
+}
+
+const handleSizeChange = (val) => {
+    pageSize.value = val
+    currentPage.value = 1
+    loadData()
 }
 
 const handleRemove = (id) => {

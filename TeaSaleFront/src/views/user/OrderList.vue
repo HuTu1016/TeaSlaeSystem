@@ -57,6 +57,19 @@
       </el-card>
       <el-empty v-if="orders.length === 0" description="暂无订单" />
     </div>
+    
+    <!-- 分页 -->
+    <div class="pagination-container" v-if="total > 0">
+      <el-pagination
+        v-model:current-page="currentPage"
+        v-model:page-size="pageSize"
+        :page-sizes="[10, 20, 50, 100]"
+        :total="total"
+        layout="total, sizes, prev, pager, next, jumper"
+        @size-change="handleSizeChange"
+        @current-change="handlePageChange"
+      />
+    </div>
   </div>
 </template>
 
@@ -72,7 +85,26 @@ const activeStatus = ref('ALL')
 const orders = ref([])
 const loading = ref(false)
 const reviewedOrderIds = ref([]) // 已全部评价的订单ID列表
+const currentPage = ref(1)
+const pageSize = ref(10)
+const total = ref(0)
 let requestId = 0 // 请求计数器，用于防止竞态条件
+
+// 订单状态排序优先级（全部条件下：待付款优先，售后中其次）
+const getOrderPriority = (order) => {
+  // 待付款最优先
+  if (order.status === 'CREATED') return 1
+  // 售后中其次
+  if (order.hasAfterSale) return 2
+  // 其他状态按原顺序
+  const statusOrder = { PAID: 3, SHIPPED: 4, COMPLETED: 5, CANCELLED: 6 }
+  return statusOrder[order.status] || 99
+}
+
+// 对订单按优先级排序
+const sortOrdersByPriority = (items) => {
+  return [...items].sort((a, b) => getOrderPriority(a) - getOrderPriority(b))
+}
 
 const formatStatus = (status) => {
     const map = {
@@ -102,8 +134,8 @@ const loadOrders = async () => {
     const statusToQuery = activeStatus.value // 在发送请求前捕获当前状态
     try {
         const params = {
-            page: 1,
-            pageSize: 20
+            page: currentPage.value,
+            pageSize: pageSize.value
         }
         // 售后中筛选需要查询全部订单然后过滤
         if (statusToQuery !== 'ALL' && statusToQuery !== 'AFTER_SALE') {
@@ -122,7 +154,12 @@ const loadOrders = async () => {
             if (statusToQuery === 'AFTER_SALE') {
                 orderList = orderList.filter(order => order.hasAfterSale)
             }
+            // 全部条件下按优先级排序
+            if (statusToQuery === 'ALL') {
+                orderList = sortOrdersByPriority(orderList)
+            }
             orders.value = orderList
+            total.value = orderRes.total || 0
             reviewedOrderIds.value = reviewStatusRes || []
             loading.value = false
         }
@@ -133,6 +170,17 @@ const loadOrders = async () => {
             loading.value = false
         }
     }
+}
+
+const handleSizeChange = (val) => {
+    pageSize.value = val
+    currentPage.value = 1
+    loadOrders()
+}
+
+const handlePageChange = (val) => {
+    currentPage.value = val
+    loadOrders()
 }
 
 // 确认收货
@@ -232,6 +280,7 @@ const goToAfterSaleDetail = (order) => {
 const handleTabClick = (pane) => {
     // pane.props.name 是新选中的标签名称
     // 但此时 v-model 已经更新了，所以可以使用 nextTick 确保状态同步后再请求
+    currentPage.value = 1 // 切换tab时重置页码
     nextTick(() => {
         loadOrders()
     })
@@ -286,5 +335,11 @@ onMounted(() => {
 .btns {
     display: flex;
     gap: 10px;
+}
+
+.pagination-container {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
 }
 </style>

@@ -88,12 +88,14 @@
       </div>
 
       <!-- 分页 -->
-      <div class="expense-pagination" v-if="total > pageSize">
+      <div class="expense-pagination" v-if="total > 0">
         <el-pagination
           v-model:current-page="page"
-          :page-size="pageSize"
+          v-model:page-size="pageSize"
+          :page-sizes="[10, 20, 50, 100]"
           :total="total"
-          layout="prev, pager, next"
+          layout="total, sizes, prev, pager, next, jumper"
+          @size-change="handleSizeChange"
           @current-change="fetchExpenseList"
         />
       </div>
@@ -193,6 +195,12 @@ const fetchExpenseList = async () => {
 }
 
 const handleFilterChange = () => {
+  page.value = 1
+  fetchExpenseList()
+}
+
+const handleSizeChange = (val) => {
+  pageSize.value = val
   page.value = 1
   fetchExpenseList()
 }

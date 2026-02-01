@@ -42,6 +42,19 @@
       </el-table-column>
     </el-table>
     <el-empty v-if="records.length === 0 && !loading" description="暂无售后记录" />
+    
+    <!-- 分页 -->
+    <div class="pagination-container" v-if="total > 0">
+      <el-pagination
+        v-model:current-page="currentPage"
+        v-model:page-size="pageSize"
+        :page-sizes="[10, 20, 50, 100]"
+        :total="total"
+        layout="total, sizes, prev, pager, next, jumper"
+        @size-change="handleSizeChange"
+        @current-change="handlePageChange"
+      />
+    </div>
   </div>
 </template>
 
@@ -55,6 +68,30 @@ const router = useRouter()
 const activeName = ref('all')
 const records = ref([])
 const loading = ref(false)
+const currentPage = ref(1)
+const pageSize = ref(10)
+const total = ref(0)
+
+// 状态排序优先级（全部条件下：待处理优先，已拒绝其次）
+const statusPriority = {
+  APPLIED: 1,           // 待处理最优先
+  MERCHANT_REJECTED: 2, // 已拒绝其次
+  MERCHANT_APPROVED: 3,
+  BUYER_SHIPPED_BACK: 4,
+  MERCHANT_RECEIVED: 5,
+  REFUNDING: 6,
+  COMPLETED: 7,
+  CANCELLED: 8
+}
+
+// 对记录按状态优先级排序
+const sortRecordsByPriority = (items) => {
+  return [...items].sort((a, b) => {
+    const priorityA = statusPriority[a.status] || 99
+    const priorityB = statusPriority[b.status] || 99
+    return priorityA - priorityB
+  })
+}
 
 const formatType = (type) => {
   const map = { REFUND_ONLY: '仅退款', RETURN_REFUND: '退货退款', EXCHANGE: '换货' }
@@ -98,12 +135,18 @@ const formatDate = (dateStr) => {
 const loadAfterSales = async () => {
   loading.value = true
   try {
-    const params = { page: 1, pageSize: 20 }
+    const params = { page: currentPage.value, pageSize: pageSize.value }
     if (activeName.value !== 'all') {
       params.status = activeName.value
     }
     const res = await getAfterSales(params)
-    records.value = res.items || []
+    let items = res.items || []
+    // 全部条件下按状态优先级排序
+    if (activeName.value === 'all') {
+      items = sortRecordsByPriority(items)
+    }
+    records.value = items
+    total.value = res.total || 0
   } catch (error) {
     console.error('加载售后列表失败:', error)
   } finally {
@@ -111,8 +154,20 @@ const loadAfterSales = async () => {
   }
 }
 
+const handleSizeChange = (val) => {
+  pageSize.value = val
+  currentPage.value = 1
+  loadAfterSales()
+}
+
+const handlePageChange = (val) => {
+  currentPage.value = val
+  loadAfterSales()
+}
+
 const handleTabChange = () => {
   // 使用nextTick确保activeName已更新后再加载数据
+  currentPage.value = 1 // 切换tab时重置页码
   nextTick(() => {
     loadAfterSales()
   })
@@ -155,5 +210,11 @@ onMounted(() => {
 
 .el-table {
   margin-top: 20px;
+}
+
+.pagination-container {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
 }
 </style>

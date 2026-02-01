@@ -14,7 +14,8 @@ import {
   Ticket,
   ChatDotSquare,
   Search,
-  Check
+  Check,
+  DataLine
 } from '@element-plus/icons-vue'
 
 const router = useRouter()
@@ -75,7 +76,8 @@ const menus = computed(() => {
                    { index: '/admin/trace', title: '溯源审核' }
                ]
             },
-            { index: '/admin/search', icon: Search, title: '搜索管理' }
+            { index: '/admin/search', icon: Search, title: '搜索管理' },
+            { index: '/admin/statistics', icon: DataLine, title: '数据统计' }
         ]
     }
     return []

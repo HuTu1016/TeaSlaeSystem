@@ -139,6 +139,13 @@ const router = createRouter({
                     name: 'admin-aftersale-list',
                     component: () => import('../views/admin/aftersale/AfterSaleList.vue'),
                     meta: { title: '售后管理' }
+                },
+                // 数据统计
+                {
+                    path: 'admin/statistics',
+                    name: 'admin-statistics',
+                    component: () => import('../views/admin/statistics/index.vue'),
+                    meta: { title: '数据统计' }
                 }
             ]
         }

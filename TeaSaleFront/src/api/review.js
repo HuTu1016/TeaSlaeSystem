@@ -35,11 +35,13 @@ export function getProductReviews(productId, params) {
 
 /**
  * 获取用户待评价商品列表
+ * @param {Object} params - 分页参数 { page, pageSize }
  */
-export function getPendingReviewItems() {
+export function getPendingReviewItems(params) {
     return request({
         url: '/reviews/pending-items',
-        method: 'get'
+        method: 'get',
+        params
     })
 }
 

@@ -18,6 +18,19 @@
             </div>
             <el-empty v-if="pendingItems.length === 0 && !pendingLoading" description="暂无待评价商品" />
           </div>
+          <!-- 待评价分页 -->
+          <div class="pagination-container" v-if="pendingTotal > 0">
+            <el-pagination
+              background
+              v-model:current-page="pendingPage"
+              v-model:page-size="pendingPageSize"
+              :page-sizes="[10, 20, 50, 100]"
+              :total="pendingTotal"
+              layout="total, sizes, prev, pager, next, jumper"
+              @size-change="handlePendingSizeChange"
+              @current-change="loadPendingItems"
+            />
+          </div>
        </el-tab-pane>
        <!-- 已评价标签页 -->
        <el-tab-pane label="已评价" name="published">
@@ -47,6 +60,19 @@
             </div>
             <el-empty v-if="reviews.length === 0 && !loading" description="暂无评价记录" />
           </div>
+          <!-- 已评价分页 -->
+          <div class="pagination-container" v-if="reviewTotal > 0">
+            <el-pagination
+              background
+              v-model:current-page="reviewPage"
+              v-model:page-size="reviewPageSize"
+              :page-sizes="[10, 20, 50, 100]"
+              :total="reviewTotal"
+              layout="total, sizes, prev, pager, next, jumper"
+              @size-change="handleReviewSizeChange"
+              @current-change="loadReviews"
+            />
+          </div>
        </el-tab-pane>
     </el-tabs>
   </div>
@@ -65,12 +91,23 @@ const loading = ref(false)
 const pendingItems = ref([])
 const pendingLoading = ref(false)
 
+// 待评价分页
+const pendingPage = ref(1)
+const pendingPageSize = ref(10)
+const pendingTotal = ref(0)
+
+// 已评价分页
+const reviewPage = ref(1)
+const reviewPageSize = ref(10)
+const reviewTotal = ref(0)
+
 // 加载待评价列表
 const loadPendingItems = async () => {
   pendingLoading.value = true
   try {
-    const res = await getPendingReviewItems()
-    pendingItems.value = res || []
+    const res = await getPendingReviewItems({ page: pendingPage.value, pageSize: pendingPageSize.value })
+    pendingItems.value = res.items || res || []
+    pendingTotal.value = res.total || pendingItems.value.length
   } catch (error) {
     console.error('加载待评价列表失败:', error)
     pendingItems.value = []
@@ -83,8 +120,9 @@ const loadPendingItems = async () => {
 const loadReviews = async () => {
   loading.value = true
   try {
-    const res = await getMyReviews({ page: 1, pageSize: 20 })
-    reviews.value = res.list || []
+    const res = await getMyReviews({ page: reviewPage.value, pageSize: reviewPageSize.value })
+    reviews.value = res.list || res.items || []
+    reviewTotal.value = res.total || reviews.value.length
   } catch (error) {
     console.error('加载评价列表失败:', error)
     reviews.value = []
@@ -93,12 +131,26 @@ const loadReviews = async () => {
   }
 }
 
-// 切换标签时加载对应数据
+const handlePendingSizeChange = (val) => {
+  pendingPageSize.value = val
+  pendingPage.value = 1
+  loadPendingItems()
+}
+
+const handleReviewSizeChange = (val) => {
+  reviewPageSize.value = val
+  reviewPage.value = 1
+  loadReviews()
+}
+
+// 切换标签时加载对应数据，重置页码
 const handleTabChange = (tab) => {
   // tab.paneName 是点击的标签名
   if (tab.paneName === 'pending') {
+    pendingPage.value = 1
     loadPendingItems()
   } else {
+    reviewPage.value = 1
     loadReviews()
   }
 }
@@ -231,5 +283,11 @@ onMounted(() => {
     margin-left: 15px;
     display: flex;
     align-items: center;
+}
+
+.pagination-container {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
 }
 </style>
